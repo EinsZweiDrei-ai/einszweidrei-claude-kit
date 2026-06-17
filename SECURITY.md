@@ -13,7 +13,7 @@ issue.
 
 1. Use GitHub's private vulnerability reporting: open the repository's
    **Security** tab and click **Report a vulnerability**.
-2. Alternatively, email [INSERT SECURITY CONTACT EMAIL].
+2. Alternatively, email hallo@einszweidrei.ai.
 
 We will acknowledge your report as soon as possible and work with you on a
 coordinated disclosure timeline.
