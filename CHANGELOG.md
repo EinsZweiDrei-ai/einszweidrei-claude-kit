@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Pinned an explicit `model` to every subagent (quality-first): all application-code
+  agents (backend, frontend) and the reasoning-heavy reviewers/analysts
+  (`architect-reviewer`, `code-reviewer`, `security-auditor`, `security-engineer`,
+  `performance-engineer`, `debugger`) run on `opus`; infra, test-automation, and
+  documentation agents run on `sonnet`.
+
 ## [0.1.0] - 2026-06-17
 
 ### Added

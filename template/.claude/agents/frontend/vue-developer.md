@@ -2,6 +2,7 @@
 name: vue-developer
 description: "Use this agent to build, refactor, or review modern Vue 3 applications and components — Composition API, TypeScript, Pinia, composables, performance, accessibility, and testing."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, conventions, and standards exactly.

@@ -2,6 +2,7 @@
 name: documentation-engineer
 description: "Use this agent to write or improve technical documentation — READMEs, API/reference docs, architecture/ADR notes, code comments/docstrings, and diagrams. Keeps docs accurate and close to the code."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: sonnet
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, conventions, and standards exactly.

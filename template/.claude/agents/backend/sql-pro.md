@@ -2,6 +2,7 @@
 name: sql-pro
 description: "Use this agent when you need to optimize complex SQL queries, design efficient database schemas, or solve performance issues across PostgreSQL, MySQL, SQL Server, and Oracle requiring advanced query optimization, index strategies, or data warehouse patterns."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, database, performance, and security rules exactly.

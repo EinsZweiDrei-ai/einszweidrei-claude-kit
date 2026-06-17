@@ -2,6 +2,7 @@
 name: dotnet-core-expert
 description: "Use when building .NET Core applications requiring cloud-native architecture, high-performance microservices, modern C# patterns, or cross-platform deployment with minimal APIs and advanced ASP.NET Core features."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, database, performance, and security rules exactly.

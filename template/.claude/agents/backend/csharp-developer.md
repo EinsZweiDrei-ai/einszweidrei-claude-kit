@@ -2,6 +2,7 @@
 name: csharp-developer
 description: "Use this agent when building ASP.NET Core web APIs, cloud-native .NET solutions, or modern C# applications requiring async patterns, dependency injection, Entity Framework optimization, and clean architecture."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, database, performance, and security rules exactly.

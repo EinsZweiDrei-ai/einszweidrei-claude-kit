@@ -2,6 +2,7 @@
 name: database-administrator
 description: "Use this agent when optimizing database performance, implementing high-availability architectures, setting up disaster recovery, or managing database infrastructure for production systems."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, database, performance, and security rules exactly.

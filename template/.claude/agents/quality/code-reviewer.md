@@ -2,6 +2,7 @@
 name: code-reviewer
 description: "Use this agent to review C#/.NET changes for correctness, security, performance, and maintainability against this project's standards. Ideal before merging a PR or after implementing a feature."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, database, performance, and security rules exactly.

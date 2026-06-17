@@ -2,6 +2,7 @@
 name: architect-reviewer
 description: "Use this agent to evaluate design decisions, layer boundaries, pattern choices, and technical-debt impact at the macro level for this .NET API project. Ideal before introducing a new module, service, or significant refactor."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, database, performance, and security rules exactly.

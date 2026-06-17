@@ -2,6 +2,7 @@
 name: react-developer
 description: "Use this agent to build, refactor, or review modern React applications and components — hooks, TypeScript, state management, performance, accessibility, and testing."
 tools: Read, Write, Edit, Bash, Glob, Grep
+model: opus
 ---
 
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything below conflicts with it, CLAUDE.md wins — follow the project's architecture, conventions, and standards exactly.
