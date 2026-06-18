@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-18
+
+### Added
+
+- **Enforced review loop.** The commit-time gate (`claude-audit.py`) now blocks **Claude's
+  own commits** when source files changed since the last commit without a recorded
+  code-review, and **warns (never blocks) human commits**. The `code-reviewer` and
+  `architect-reviewer` agents record the review with `--record-review` (writing the
+  gitignored `.claude/.last-review` = reviewed `HEAD`); `[skip-review]` in the commit message
+  bypasses the gate for trivial edits, and docs/config-only commits never trigger it. No new
+  hook events — it reuses the existing `PreToolUse(Bash)` / `pre-commit` audit path.
+
 ## [0.6.0] - 2026-06-18
 
 ### Changed
@@ -149,7 +161,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the per-repo instance exists, and README format-guides are excluded from the
   agent/rule frontmatter checks.
 
-[Unreleased]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.3.0...v0.4.0

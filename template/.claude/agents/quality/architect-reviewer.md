@@ -29,3 +29,6 @@ Lead with a one-paragraph verdict (sound / sound-with-conditions / needs-rework)
 - **Debt impact** — what this adds to or removes from `tech-debt.md`.
 
 Be pragmatic: balance ideal architecture against current constraints. Cite specifics; do not invent metrics or percentages. State uncertainty plainly.
+
+## Record the review
+When your review is complete, record it so the commit-time review gate passes: run `python .claude/scripts/claude-audit.py --record-review`.

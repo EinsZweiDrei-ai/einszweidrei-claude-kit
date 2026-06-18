@@ -7,7 +7,7 @@ How to work in this repo. Stack-agnostic; project specifics: [project/context.md
 2. **Plan first** (non-trivial work) — outline approach + files to touch *before* editing. For a new module/service or a structural/layer change, get `architect-reviewer` input first.
 3. **Implement** — follow [CLAUDE.md](../CLAUDE.md) and the file-type rules that auto-apply from [rules/](rules/).
 4. **Self-check (Definition of Done)** — build + tests pass; **docs synced** (in-code + README/changelog); **files placed correctly** per `context.md`.
-5. **Auto-review (required)** — delegate to `code-reviewer` (and `architect-reviewer` for new modules/structural change). Apply findings, or record accepted ones in `project/tech-debt.md`.
+5. **Auto-review (required)** — delegate to `code-reviewer` (and `architect-reviewer` for new modules/structural change). Apply findings, or record accepted ones in `project/tech-debt.md`. **Enforced at commit:** changing source without a recorded review blocks Claude's commit; the reviewer agents record it automatically, and `[skip-review]` in the commit message bypasses it for trivial edits.
 6. **Done** — the gates in [rules/code-review.md](rules/code-review.md) pass.
 
 Trivial edits (typos, comments, formatting, config tweaks) may skip steps 2 and 5.

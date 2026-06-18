@@ -95,4 +95,6 @@ restate the thresholds here or in the layer rules.
 
 **Auto-review (required):** after implementing or non-trivially changing code, delegate to the `code-reviewer` agent — and additionally to `architect-reviewer` for new modules/services or structural/layer changes — to audit the change against the checklist **before declaring work done**. Apply the findings, or record accepted ones in [.claude/project/tech-debt.md](.claude/project/tech-debt.md). Skip only for truly trivial edits (typos, comments, formatting, config tweaks).
 
+This is **enforced at commit time**: a commit that changes source files without a recorded review is blocked for Claude. The reviewer agents record the review automatically; for a trivial edit, add `[skip-review]` to the commit message.
+
 Full checklist: [.claude/rules/code-review.md](.claude/rules/code-review.md).

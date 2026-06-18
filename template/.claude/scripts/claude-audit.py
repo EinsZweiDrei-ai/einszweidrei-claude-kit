@@ -6,18 +6,27 @@ WARN (exit 0): stale backtick path refs, project-name leakage, context.md drift.
 
 Cross-platform (Windows + Linux + macOS). Standard library only — no dependencies.
 
-Usage:
-    python claude-audit.py [ROOT] [--pre-commit | --hook]
+On a commit, --pre-commit and --hook additionally run the REVIEW GATE: if source files
+changed since the last commit without a recorded code-review (.claude/.last-review), the
+commit is BLOCKED for Claude (--hook) and WARNED for humans (--pre-commit). Reviewer agents
+record the review with --record-review; [skip-review] in the commit message bypasses it.
 
-    ROOT           Directory to audit (default: git toplevel, else CWD).
-    (no flag)      Run the audit and print the full report. Exit 1 on FAIL, else 0.
-    --pre-commit   Silent on PASS; on FAIL print guidance + report to stderr and
-                   exit 2. Use from a git pre-commit hook (any non-zero blocks).
-    --hook         Claude Code PreToolUse(Bash) gate. Reads the hook payload on
-                   stdin, and runs the audit ONLY when the command is a `git commit`
-                   (allowing every other Bash call through with exit 0). Hook
-                   matchers filter on tool NAME only, so this command-level gate has
-                   to live here, in the script — not in settings.json.
+Usage:
+    python claude-audit.py [ROOT] [--pre-commit | --hook | --record-review]
+
+    ROOT            Directory to audit (default: git toplevel, else CWD).
+    (no flag)       Run the audit and print the full report. Exit 1 on FAIL, else 0.
+    --pre-commit    Silent on PASS; on FAIL print guidance + report to stderr and
+                    exit 2. Use from a git pre-commit hook (any non-zero blocks).
+                    Also warns (does not block) on a pending review.
+    --hook          Claude Code PreToolUse(Bash) gate. Reads the hook payload on
+                    stdin, and runs the audit ONLY when the command is a `git commit`
+                    (allowing every other Bash call through with exit 0). Hook
+                    matchers filter on tool NAME only, so this command-level gate has
+                    to live here, in the script — not in settings.json. Blocks the
+                    commit (exit 2) on a structural FAIL or a pending review.
+    --record-review Stamp .claude/.last-review with the current HEAD, then exit 0.
+                    Reviewer agents call this when their review is complete.
 """
 
 import argparse
@@ -185,6 +194,117 @@ def find_csproj(root, filename, maxdepth=3):
         if filename in filenames:
             return True
     return False
+
+
+# --- Review gate ----------------------------------------------------------------
+# The kit's workflow requires a code-review before code is committed. This enforces it:
+# the reviewer agents stamp the reviewed commit into .claude/.last-review (via
+# --record-review), and a commit that changes source files without a matching record is
+# BLOCKED for Claude (--hook) and WARNED for humans (--pre-commit). [skip-review] in the
+# commit message bypasses it (trivial edits); docs/config-only commits never trigger it.
+
+REVIEW_MARKER = ".claude/.last-review"
+
+_NON_SOURCE_EXT = (
+    ".md", ".json", ".yml", ".yaml", ".toml", ".ini", ".cfg", ".lock", ".txt",
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico",
+)
+_NON_SOURCE_BASENAMES = {
+    "license", "license.txt", "license.md", ".gitignore", ".gitattributes",
+    ".editorconfig", ".dockerignore", ".kit-version",
+}
+
+
+def _git(root, git_args):
+    """Run a git command in `root`; return (returncode, stdout). Never raises."""
+    try:
+        out = subprocess.run(["git"] + git_args, capture_output=True, text=True, cwd=root)
+        return out.returncode, out.stdout
+    except OSError:
+        return 1, ""
+
+
+def current_head(root):
+    rc, out = _git(root, ["rev-parse", "HEAD"])
+    head = out.strip()
+    return head if rc == 0 and head else "ROOT"
+
+
+def is_source_path(path):
+    """True if `path` is code that warrants review (not docs, config, or .claude/)."""
+    p = path.replace("\\", "/").lower()
+    if p.startswith(".claude/"):
+        return False
+    base = p.rsplit("/", 1)[-1]
+    if base in _NON_SOURCE_BASENAMES:
+        return False
+    if p.endswith(_NON_SOURCE_EXT):
+        return False
+    return True
+
+
+def changed_source_files(root):
+    """Source files changed since HEAD (staged + unstaged). None if undeterminable."""
+    rc, out = _git(root, ["diff", "HEAD", "--name-only"])
+    if rc != 0:  # e.g. no commits yet — fall back to the staged set
+        rc, out = _git(root, ["diff", "--cached", "--name-only"])
+        if rc != 0:
+            return None
+    return [f.strip() for f in out.splitlines() if f.strip() and is_source_path(f.strip())]
+
+
+def read_review_marker(root):
+    """The commit recorded as reviewed, or None if there is no marker."""
+    path = os.path.join(root, ".claude", ".last-review")
+    try:
+        if not os.path.isfile(path):
+            return None
+        content = read(path).strip()
+    except OSError:
+        return None
+    return content.splitlines()[0].strip() if content else None
+
+
+def commit_message_has_skip(root, command):
+    """True if a [skip-review] escape is present (commit command or COMMIT_EDITMSG)."""
+    if command and "[skip-review]" in command:
+        return True
+    path = os.path.join(root, ".git", "COMMIT_EDITMSG")
+    try:
+        if os.path.isfile(path) and "[skip-review]" in read(path):
+            return True
+    except OSError:
+        pass
+    return False
+
+
+def review_pending(root, command):
+    """Guidance string if source changed without a recorded review; else None."""
+    changed = changed_source_files(root)
+    if not changed:  # None (unknown) or [] (no source) — nothing to enforce
+        return None
+    if commit_message_has_skip(root, command):
+        return None
+    if read_review_marker(root) == current_head(root):
+        return None  # a review was recorded against the current state
+    n = len(changed)
+    preview = ", ".join(changed[:5]) + (" ..." if n > 5 else "")
+    return (
+        f"No code-review recorded for {n} changed source file(s) since the last commit "
+        f"({preview}). Run the code-reviewer agent (workflow step 5), apply its findings, "
+        "then commit - it records the review automatically. For a trivial edit, add "
+        "[skip-review] to the commit message."
+    )
+
+
+def record_review(root):
+    """Stamp .claude/.last-review with the current HEAD (called by reviewer agents)."""
+    head = current_head(root)
+    path = os.path.join(root, ".claude", ".last-review")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(head + "\n")
+    print(f"  recorded review marker {REVIEW_MARKER} = {head}")
 
 
 def run_audit(root):
@@ -383,10 +503,22 @@ def main(argv=None):
         help="PreToolUse(Bash) gate: read the hook payload on stdin and audit only "
         "git-commit commands. Allows every other Bash call through (exit 0).",
     )
+    gate.add_argument(
+        "--record-review",
+        action="store_true",
+        help="Stamp .claude/.last-review with the current HEAD, then exit. Reviewer "
+        "agents call this when their review is complete.",
+    )
     args = parser.parse_args(argv if argv is not None else sys.argv[1:])
+
+    # Reviewer agents call this to record that a review happened, then we're done.
+    if args.record_review:
+        record_review(os.path.abspath(args.root) if args.root else repo_root())
+        return 0
 
     # --hook self-gates to git commits: the matcher fires this on EVERY Bash call, so
     # we inspect the command and bail out (allow) unless it's an actual `git commit`.
+    cmd = None
     if args.hook:
         cmd = command_from_hook_stdin()
         if not looks_like_git_commit(cmd):
@@ -405,6 +537,13 @@ def main(argv=None):
             print("\n".join(report), file=sys.stderr)
             print("Run /claude-audit and resolve the FAIL items, then retry the commit.", file=sys.stderr)
             return 2  # exit 2 = block the tool call; stderr is fed back to Claude
+        # Review gate: source changed without a recorded code-review.
+        pending = review_pending(root, cmd)
+        if pending:
+            if args.hook:  # Claude's own commit — block it
+                print("BLOCKED: " + pending, file=sys.stderr)
+                return 2
+            print("WARNING: " + pending, file=sys.stderr)  # human commit — warn, allow
         return 0
 
     print("\n".join(report))

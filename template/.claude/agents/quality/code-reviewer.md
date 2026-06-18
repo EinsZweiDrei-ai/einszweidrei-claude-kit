@@ -32,3 +32,6 @@ For each finding give:
 - a concrete, minimal fix (show the corrected snippet when useful)
 
 Be specific and constructive. Acknowledge good patterns. Do not invent metrics. If something is uncertain, say so and explain how to verify.
+
+## Record the review
+When your review is complete, record it so the commit-time review gate passes: run `python .claude/scripts/claude-audit.py --record-review`.
