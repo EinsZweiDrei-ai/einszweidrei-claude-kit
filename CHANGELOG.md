@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-18
+
+### Added
+
+- **Swagger/OpenAPI doc-sync standard** — the controllers rule and the code-review
+  "Docs synced" gate now require the OpenAPI spec (XML docs, `[ProducesResponseType]`,
+  request/response schemas) to stay in sync with every added, changed, or removed
+  endpoint in projects that expose Swagger/OpenAPI.
+
 ## [0.3.0] - 2026-06-17
 
 ### Added
@@ -103,7 +112,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the per-repo instance exists, and README format-guides are excluded from the
   agent/rule frontmatter checks.
 
-[Unreleased]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/releases/tag/v0.1.0

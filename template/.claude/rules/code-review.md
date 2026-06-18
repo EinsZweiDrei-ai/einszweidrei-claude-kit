@@ -22,7 +22,7 @@ while any **Gate** item fails.
 - [ ] Inputs validated; access secured (authn/authz) unless anonymity is justified.
 - [ ] No secrets in code; no internal error detail leaked to clients.
 - [ ] Changed core logic has tests; coverage **≥ 80%** on changed code.
-- [ ] **Docs synced** with the change: public API/behavior changes have updated in-code docs (XML/docstrings); new or changed endpoints, config, env vars, or setup reflected in README/usage docs; user-facing changes have a changelog/release-notes entry (`release-manager`).
+- [ ] **Docs synced** with the change: public API/behavior changes have updated in-code docs (XML/docstrings); new or changed endpoints, config, env vars, or setup reflected in README/usage docs; user-facing changes have a changelog/release-notes entry (`release-manager`); when the project exposes Swagger/OpenAPI, the spec is current — annotations (`[ProducesResponseType]`, XML docs, request/response schemas) match every added, changed, or removed endpoint, with no stale or missing operations.
 - [ ] **Structure & placement**: new/moved files are in the correct folder per `.claude/project/context.md`; dead files removed when their code is removed; no stray files at the repo root; no build artifacts/temp/`.bak` committed; folder & naming conventions followed.
 - [ ] **Stack-specific gates pass** for the files touched (see the matching rule).
 

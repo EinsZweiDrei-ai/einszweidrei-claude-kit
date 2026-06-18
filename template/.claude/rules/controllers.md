@@ -16,3 +16,4 @@ Auto-applies when editing controllers. Full standards: [CLAUDE.md](../../CLAUDE.
 - Propagate `CancellationToken` from the action into the service call.
 - Let exceptions bubble to the global error-handling middleware — don't catch-and-swallow. Use the project's standard result wrapper.
 - One responsibility per endpoint; keep actions small.
+- **Keep the API contract documented (when the project exposes Swagger/OpenAPI):** every endpoint you add, change, or remove must be reflected in the generated spec — XML `///` summary/`<param>`/`<response>` docs on the action, an accurate `[ProducesResponseType]` per returned status code, the request/response DTO schemas, and auth requirements. Never leave the spec describing a route, parameter, or status that no longer matches the code.
