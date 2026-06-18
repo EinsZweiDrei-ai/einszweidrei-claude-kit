@@ -74,7 +74,7 @@ See [.claude/workflow.md](.claude/workflow.md) for the working loop (plan → im
 - Test **behavior**, including edge and failure paths — not just the happy path.
 - Mock at boundaries; tests isolated and deterministic. Meet the coverage gate on changed core logic (threshold in [.claude/rules/code-review.md](.claude/rules/code-review.md)).
 - Verify the build and tests pass before declaring work done; pass linters with zero new violations.
-- Conventions in [.claude/rules/testing.md](.claude/rules/testing.md).
+- Stack-specific test conventions live in the matching test rule under `.claude/rules/` (when its pack is installed).
 
 ## Code Quality
 

@@ -1,5 +1,6 @@
 ---
 description: Frontend (TypeScript / React / Vue) conventions
+pack: frontend
 paths:
   - "**/*.ts"
   - "**/*.tsx"

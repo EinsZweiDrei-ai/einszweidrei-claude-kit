@@ -1,5 +1,6 @@
 ---
 name: vue-developer
+pack: frontend
 description: "Use this agent to build, refactor, or review modern Vue 3 applications and components — Composition API, TypeScript, Pinia, composables, performance, accessibility, and testing."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus

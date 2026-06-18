@@ -23,8 +23,8 @@ You can use either or both.
 | `CLAUDE.md`        | `template/CLAUDE.md`                       | Stack-agnostic engineering standards — SOLID, KISS/DRY/YAGNI, security, testing, quality gates. |
 | Settings           | `template/.claude/settings.json`          | Shared permissions + a commit-audit hook and a session-start bootstrap hook.     |
 | Workflow           | `template/.claude/workflow.md`            | The working loop (plan → implement → review → done) and task→agent routing.     |
-| Subagents          | `template/.claude/agents/`                | A **curated** ~21 specialist agents in `backend/`, `frontend/`, `infra/`, `quality/`. |
-| Stack rules        | `template/.claude/rules/`                  | File-type rules (.NET, controllers, repositories, services, frontend, testing) plus always-on `code-review.md` and `security.md`. |
+| Subagents          | `template/.claude/agents/`                | A **curated** ~21 specialist agents in `backend/`, `frontend/`, `infra/`, `quality/`. Stack-specific ones carry a `pack:` tag (`dotnet`/`frontend`) so an install can be trimmed; the rest are core. |
+| Stack rules        | `template/.claude/rules/`                  | File-type rules that auto-apply by path. **Core:** always-on `code-review.md`, `commits.md`, `security.md`. **Pack-tagged:** `dotnet` (dotnet/controllers/repositories/services/testing) and `frontend`. |
 | Slash commands     | `template/.claude/commands/`              | `*.md` commands (`/claude-audit`, `/kit-init`); format guide in the README there. |
 | Audit tooling      | `template/.claude/scripts/` + `hooks/` + `.githooks/` | `claude-audit.py` consistency check, the `pre-commit-audit.sh` PreToolUse launcher, the `session-start.sh` bootstrap, and a `.githooks/pre-commit` for human commits. |
 | Project instance   | `template/.claude/project/`               | Per-repo `context.md` profile + `tech-debt.md` register (placeholders to fill). |
@@ -76,8 +76,9 @@ freshly-installed files and exits non-zero if anything fails — so you can't en
 broken kit. It also stamps the kit version into `.claude/.kit-version`.
 
 After installing, run **`/kit-init`** in Claude Code once. It inspects your repo, writes
-`.claude/project/context.md` from what it finds, and enables the git pre-commit audit hook
-(`git config core.hooksPath .githooks`) so human commits are gated too.
+`.claude/project/context.md` from what it finds, **trims the kit to your stack's packs**, and
+enables the git pre-commit audit hook (`git config core.hooksPath .githooks`) so human commits
+are gated too.
 
 The installer is non-destructive: it skips files that already exist. To overwrite,
 pass `--force` (or set `FORCE=1`):
@@ -85,6 +86,22 @@ pass `--force` (or set `FORCE=1`):
 ```sh
 python install.py /path/to/your/project --force
 ```
+
+### Lean, stack-specific installs (packs)
+
+By default the installer copies the **full kit** — so a plain copy-paste of `template/.claude/`
+also works in any project (pack rules self-scope by file type, and agents are inert until
+invoked). To install only what a stack needs, pass `--packs`:
+
+```sh
+python install.py /path/to/your/project --packs=dotnet     # or frontend, or dotnet,frontend
+```
+
+Core files are always included; pack-tagged files (those with a `pack:` frontmatter field) are
+included only when their pack is listed. The selection is recorded in `.claude/.kit-packs`, and
+`update` honors it. You can also trim an existing full install — `python install.py prune
+/path/to/your/project --packs=frontend` — or just run **`/kit-init`**, which detects the stack
+and trims to the matching pack(s) for you.
 
 ### Updating an installed kit
 

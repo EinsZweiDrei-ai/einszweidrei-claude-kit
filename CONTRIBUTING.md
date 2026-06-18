@@ -13,8 +13,8 @@ contribution in the matching directory:
 | You're adding…   | Put it here                                            | Shape                                          |
 | ---------------- | ------------------------------------------------------ | ---------------------------------------------- |
 | A slash command  | `template/.claude/commands/<name>.md`                  | One `*.md` file with frontmatter.              |
-| A subagent       | `template/.claude/agents/<area>/<name>.md`             | One `*.md` file with frontmatter; `<area>` is `backend`/`frontend`/`infra`/`quality` (organization only — identity comes from the `name` field). |
-| A stack rule     | `template/.claude/rules/<name>.md`                     | One `*.md` file with `description` (and optional `paths:` to scope it by file type). |
+| A subagent       | `template/.claude/agents/<area>/<name>.md`             | One `*.md` file with frontmatter; `<area>` is `backend`/`frontend`/`infra`/`quality` (organization only — identity comes from the `name` field). Add a `pack:` tag (`dotnet`/`frontend`) for stack-specific agents; omit it for core. |
+| A stack rule     | `template/.claude/rules/<name>.md`                     | One `*.md` file with `description` (and optional `paths:` to scope by file type, plus an optional `pack:` tag like `dotnet`/`frontend` so it can be trimmed — omit `pack:` for core rules). |
 | A skill          | `template/.claude/skills/<name>/SKILL.md`              | A directory containing `SKILL.md`.             |
 
 Each component directory has a `README.md` with the full format guide and an example —
@@ -43,6 +43,7 @@ name: required — unique across all agents
 description: required — when to use this agent
 tools: optional
 model: optional
+pack: optional — stack tag (e.g. dotnet/frontend) so the file can be trimmed; omit for core
 ---
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything
 > below conflicts with it, CLAUDE.md wins.

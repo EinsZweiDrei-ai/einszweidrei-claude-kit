@@ -1,5 +1,6 @@
 ---
 name: dotnet-core-expert
+pack: dotnet
 description: "Use when building .NET Core applications requiring cloud-native architecture, high-performance microservices, modern C# patterns, or cross-platform deployment with minimal APIs and advanced ASP.NET Core features."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus

@@ -1,5 +1,6 @@
 ---
 description: .NET / C# conventions, architecture, and async rules
+pack: dotnet
 paths:
   - "**/*.cs"
 ---

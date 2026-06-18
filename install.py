@@ -4,10 +4,15 @@
 Cross-platform (Windows + Linux + macOS). Standard library only — no dependencies.
 
 Usage:
-    python install.py [TARGET_DIR] [--force] [--no-verify]
+    python install.py [TARGET_DIR] [--packs=a,b] [--force] [--no-verify]
     python install.py update [TARGET_DIR] [--no-verify]
+    python install.py prune  [TARGET_DIR] --packs=a,b [--no-verify]
 
     TARGET_DIR    Directory to install into. Defaults to the current directory.
+    --packs       Comma-separated stack packs to include (e.g. --packs=dotnet,frontend).
+                  Core files (untagged) are always included; pack-tagged files (those
+                  with a `pack:` frontmatter field) are included only when their pack is
+                  listed. Omit to install everything — the full kit stays copy-paste-able.
     --force       Overwrite files that already exist (default: skip them). The
                   FORCE=1 environment variable is honored too, for parity with
                   install.sh.
@@ -20,7 +25,11 @@ Usage:
                   .claude/settings.json is backed up to settings.json.bak before it is
                   refreshed, so any custom permissions can be re-merged.
 
-Both commands stamp the kit version into .claude/.kit-version and then run the kit's
+    prune         Remove pack-tagged files NOT in --packs from an already-installed repo,
+                  and record the selection so `update` keeps them out. /kit-init runs this
+                  after detecting the stack.
+
+These commands stamp the kit version into .claude/.kit-version and then run the kit's
 own audit against the result, failing loudly (non-zero exit) if it does not PASS — so
 it is impossible to leave behind an artifact that fails the kit's own audit.
 
@@ -30,6 +39,7 @@ Non-destructive by default: an install skips existing files unless --force/FORCE
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -44,6 +54,11 @@ PRESERVE_ON_UPDATE_PREFIXES = (".claude/project/",)
 # settings.json is portable but commonly carries team permission edits, so `update`
 # backs it up before refreshing it.
 SETTINGS_REL = os.path.join(".claude", "settings.json")
+
+# Pack selection: a file's `pack:` frontmatter field (if any) names its stack pack.
+# Untagged files are core and always installed. The chosen selection is recorded here.
+KIT_PACKS_REL = os.path.join(".claude", ".kit-packs")
+FRONTMATTER_PACK_RE = re.compile(r"^\s*pack:\s*(\S+)\s*$")
 
 
 def parse_args(argv):
@@ -62,6 +77,12 @@ def parse_args(argv):
         action="store_true",
         default=os.environ.get("FORCE") == "1",
         help="Overwrite files that already exist (default: skip them).",
+    )
+    parser.add_argument(
+        "--packs",
+        default=None,
+        help="Comma-separated stack packs to include (e.g. --packs=dotnet,frontend). "
+        "Core (untagged) files are always included; omit to install everything.",
     )
     parser.add_argument(
         "--no-verify",
@@ -99,6 +120,57 @@ def stamp_version(target_dir, version):
     with open(path, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(version + "\n")
     print(f"  stamped .claude/.kit-version = {version}")
+
+
+def file_pack(path):
+    """The `pack:` frontmatter value for a file, or None (= core, always installed).
+
+    Only the leading `---`-fenced block is inspected; non-.md or untagged files are core.
+    Never raises — selection must not crash the installer.
+    """
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as fh:
+            if fh.readline().strip() != "---":
+                return None
+            for line in fh:
+                if line.strip() == "---":
+                    break
+                m = FRONTMATTER_PACK_RE.match(line)
+                if m:
+                    return m.group(1)
+    except OSError:
+        pass
+    return None
+
+
+def parse_packs(value):
+    """Parse a --packs value (comma/space separated) into a set, or None if empty."""
+    if not value:
+        return None
+    packs = {p.strip() for p in value.replace(",", " ").split() if p.strip()}
+    return packs or None
+
+
+def read_installed_packs(target_dir):
+    """The recorded pack selection, or None for a full install (= all packs)."""
+    try:
+        with open(os.path.join(target_dir, KIT_PACKS_REL), "r", encoding="utf-8") as fh:
+            content = fh.read().strip()
+    except OSError:
+        return None
+    if not content or content == "all":
+        return None
+    return {p.strip() for p in content.replace(",", " ").split() if p.strip()}
+
+
+def write_installed_packs(target_dir, packs):
+    """Record the selection (or 'all' for a full install) in .claude/.kit-packs."""
+    path = os.path.join(target_dir, KIT_PACKS_REL)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    value = "all" if packs is None else " ".join(sorted(packs))
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(value + "\n")
+    print(f"  stamped .claude/.kit-packs = {value}")
 
 
 def iter_template(src_dir):
@@ -167,6 +239,7 @@ def print_next_steps():
 def do_install(args, src_dir, version):
     os.makedirs(args.target_dir, exist_ok=True)
     target_dir = os.path.abspath(args.target_dir)
+    selected = parse_packs(args.packs)
 
     print("Installing EinsZweiDrei Claude Kit")
     print(f"  from: {src_dir}")
@@ -176,6 +249,8 @@ def do_install(args, src_dir, version):
         if args.force
         else "  mode: non-destructive (skipping existing files)"
     )
+    if selected is not None:
+        print(f"  packs: core + {', '.join(sorted(selected))}")
     print()
 
     wrote = 0
@@ -185,6 +260,10 @@ def do_install(args, src_dir, version):
 
         if rel_display.endswith(SKIP_SUFFIXES):
             print(f"  skip   {rel_display} (personal config, never distributed)")
+            continue
+        pack = file_pack(src)
+        if selected is not None and pack is not None and pack not in selected:
+            print(f"  skip   {rel_display} (pack '{pack}' not selected)")
             continue
         if os.path.exists(dest) and not args.force:
             print(f"  skip   {rel_display} (exists)")
@@ -198,6 +277,7 @@ def do_install(args, src_dir, version):
 
     print()
     print(f"Done. {wrote} written, {skipped} skipped.")
+    write_installed_packs(target_dir, selected)
     rc = _finish_with_audit(target_dir, version, args, "installed")
     if rc == 0:
         print_next_steps()
@@ -214,11 +294,14 @@ def do_update(args, src_dir, version):
         return 1
 
     previous = read_installed_version(target_dir)
+    selected = read_installed_packs(target_dir)
     print("Updating EinsZweiDrei Claude Kit")
     print(f"  from: {src_dir}")
     print(f"  into: {target_dir}")
     print(f"  version: {previous or 'unknown'} -> {version}")
     print("  preserving: .claude/project/**, .claude/settings.local.json")
+    if selected is not None:
+        print(f"  packs: core + {', '.join(sorted(selected))} (pruned packs stay out)")
     print()
 
     refreshed = 0
@@ -230,6 +313,9 @@ def do_update(args, src_dir, version):
             print(f"  keep   {rel_display} (project-specific)")
             preserved += 1
             continue
+        pack = file_pack(src)
+        if selected is not None and pack is not None and pack not in selected:
+            continue  # pruned pack — don't re-add it
 
         dest = os.path.join(target_dir, rel)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -246,10 +332,45 @@ def do_update(args, src_dir, version):
     return _finish_with_audit(target_dir, version, args, "updated")
 
 
+def do_prune(args, version):
+    target_dir = os.path.abspath(args.target_dir)
+    claude_dir = os.path.join(target_dir, ".claude")
+    if not os.path.isdir(claude_dir):
+        print(f"error: no .claude/ found in {target_dir}; run an install first.", file=sys.stderr)
+        return 1
+    selected = parse_packs(args.packs)
+    if selected is None:
+        print("error: prune requires --packs (e.g. --packs=dotnet,frontend).", file=sys.stderr)
+        return 1
+
+    print("Pruning EinsZweiDrei Claude Kit packs")
+    print(f"  in:   {target_dir}")
+    print(f"  keep: core + {', '.join(sorted(selected))}")
+    print()
+
+    removed = 0
+    for dirpath, dirnames, filenames in os.walk(claude_dir):
+        dirnames.sort()
+        for name in sorted(filenames):
+            if not name.endswith(".md"):
+                continue
+            path = os.path.join(dirpath, name)
+            pack = file_pack(path)
+            if pack is not None and pack not in selected:
+                os.remove(path)
+                print(f"  remove {os.path.relpath(path, target_dir).replace(os.sep, '/')} (pack '{pack}')")
+                removed += 1
+
+    print()
+    print(f"Done. {removed} pack file(s) removed.")
+    write_installed_packs(target_dir, selected)
+    return _finish_with_audit(target_dir, version, args, "pruned")
+
+
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     command = "install"
-    if argv and argv[0] in ("install", "update"):
+    if argv and argv[0] in ("install", "update", "prune"):
         command = argv.pop(0)
     args = parse_args(argv)
 
@@ -263,6 +384,8 @@ def main(argv=None):
 
     if command == "update":
         return do_update(args, src_dir, version)
+    if command == "prune":
+        return do_prune(args, version)
     return do_install(args, src_dir, version)
 
 

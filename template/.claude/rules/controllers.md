@@ -1,5 +1,6 @@
 ---
 description: Rules for ASP.NET Core controllers (API layer)
+pack: dotnet
 paths:
   - "**/Controllers/**/*.cs"
   - "**/*Controller.cs"

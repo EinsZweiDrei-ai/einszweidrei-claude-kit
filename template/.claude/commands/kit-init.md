@@ -28,7 +28,25 @@ Read the placeholder at `.claude/project/context.md` for the exact section struc
 fill. Use `Glob`/`Grep`/`Read` for inspection; you may run read-only `Bash` (e.g.
 `git ls-files`, `dotnet --info`) but make no source changes outside `.claude/project/`.
 
-## 2. Generate the project profile
+## 2. Trim to the detected stack (packs)
+
+The kit ships **every pack** so a copy-paste install works anywhere; now trim to what this
+repo actually needs. Map the detected stack to packs:
+
+- `*.sln`/`*.csproj` (.NET) → keep **`dotnet`**
+- `package.json` with React/Vue, or `*.tsx`/`*.vue` files → keep **`frontend`**
+- neither → keep neither (core only)
+
+Pack-specific files carry a `pack:` line in their frontmatter. Find the pack-tagged files
+under `.claude/rules/` and `.claude/agents/` (e.g. `grep -rl "^pack:" .claude/rules .claude/agents`),
+read each one's `pack:` value, and **delete the files whose pack is not in the kept set**
+(e.g. on a React repo, remove the `pack: dotnet` rules and agents). Then record the kept
+packs in `.claude/.kit-packs` — space-separated (e.g. `frontend`), or `all` if you kept
+everything. Tell the user which packs were kept and what was removed.
+
+Skip this (leave the full kit in place) if you can't confidently determine the stack.
+
+## 3. Generate the project profile
 
 - **Rewrite [`.claude/project/context.md`](../project/context.md)** with the findings,
   following its existing headings. **Remove the `PLACEHOLDER — REPLACE THIS FILE` banner
@@ -39,7 +57,7 @@ fill. Use `Glob`/`Grep`/`Read` for inspection; you may run read-only `Bash` (e.g
 - Keep project-specific names OUT of the portable files — they belong only under
   `.claude/project/`. (The audit's leakage check enforces this.)
 
-## 3. Wire the human-commit audit hook
+## 4. Wire the human-commit audit hook
 
 If `.githooks/pre-commit` exists at the repo root, enable it so human commits are gated
 by the same audit Claude runs:
@@ -62,7 +80,7 @@ these rules if they're missing:
 *.py        text eol=lf
 ```
 
-## 4. Verify
+## 5. Verify
 
 Run the consistency audit and confirm it passes:
 
@@ -73,8 +91,8 @@ python .claude/scripts/claude-audit.py
 If it reports FAIL, fix the cause (usually a broken link or a project name that leaked
 into a portable file) and re-run until it PASSES.
 
-## 5. Report
+## 6. Report
 
-Summarize: the detected stack & layout, what you wrote to `context.md`, whether the git
-hook was wired, and the final audit RESULT. Note anything you were unsure about so the
-user can refine `context.md`.
+Summarize: the detected stack & layout, **which packs were kept and what was trimmed**,
+what you wrote to `context.md`, whether the git hook was wired, and the final audit RESULT.
+Note anything you were unsure about so the user can refine `context.md`.

@@ -1,5 +1,6 @@
 ---
 name: react-developer
+pack: frontend
 description: "Use this agent to build, refactor, or review modern React applications and components — hooks, TypeScript, state management, performance, accessibility, and testing."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus

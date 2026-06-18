@@ -1,5 +1,6 @@
 ---
 description: Test conventions
+pack: dotnet
 paths:
   - "**/*Tests.cs"
   - "**/*Test.cs"

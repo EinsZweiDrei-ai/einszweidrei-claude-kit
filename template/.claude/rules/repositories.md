@@ -1,5 +1,6 @@
 ---
 description: Rules for repositories, EF Core, and data access (Infrastructure layer)
+pack: dotnet
 paths:
   - "**/Repository/**/*.cs"
   - "**/*Repository.cs"

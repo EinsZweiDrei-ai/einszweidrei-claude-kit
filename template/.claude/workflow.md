@@ -20,7 +20,7 @@ Commit messages follow [rules/commits.md](rules/commits.md) — Conventional Com
 - When unsure, the main session handles it.
 
 ## Agent routing (task → agent)
-*Adjust to this repo's agent roster (some agents won't exist in a trimmed copy).*
+*Adjust to this repo's agent roster — pack-specific agents (e.g. `csharp-developer`, `react-developer`) are present only when their pack is installed.*
 
 | Task | Agent |
 |---|---|

@@ -3,7 +3,7 @@
   "name": "ezd-claude-kit",
   "displayName": "EinsZweiDrei Claude Kit",
   "description": "A reusable Claude Code developer kit: opinionated CLAUDE.md, subagents, slash commands, skills, and settings you can drop into any project.",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "author": {
     "name": "EinsZweiDrei.ai",
     "url": "https://einszweidrei.ai"

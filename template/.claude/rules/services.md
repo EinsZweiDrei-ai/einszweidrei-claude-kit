@@ -1,5 +1,6 @@
 ---
 description: Rules for application/business services
+pack: dotnet
 paths:
   - "**/Services/**/*.cs"
 ---

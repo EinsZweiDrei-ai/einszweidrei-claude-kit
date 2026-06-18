@@ -1,5 +1,6 @@
 ---
 name: csharp-developer
+pack: dotnet
 description: "Use this agent when building ASP.NET Core web APIs, cloud-native .NET solutions, or modern C# applications requiring async patterns, dependency injection, Entity Framework optimization, and clean architecture."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus

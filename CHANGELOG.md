@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-06-18
+
+### Added
+
+- **Stack packs (opt-in pruning).** Stack-specific rules and agents now carry a `pack:`
+  frontmatter tag (`dotnet` / `frontend`); untagged files are core. `install.py --packs=…`
+  installs core + the chosen packs, a new `install.py prune --packs=…` trims an existing
+  install, and `/kit-init` auto-trims to the detected stack. The selection is recorded in
+  `.claude/.kit-packs` and honored by `install.py update`. The full kit still installs by
+  default, so a plain copy-paste of `template/.claude/` keeps working in any stack.
+
+### Changed
+
+- `code-reviewer` and `architect-reviewer` are now stack-neutral — they review against
+  `CLAUDE.md` + whatever rules auto-apply from `.claude/rules/` + `context.md` rather than
+  hardcoding .NET/EF Core, so they sharpen correctly on any stack.
+- `code-review.md` no longer hard-links the stack rules, so a pruned install stays audit-clean.
+
 ## [0.7.0] - 2026-06-18
 
 ### Added
@@ -161,7 +179,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the per-repo instance exists, and README format-guides are excluded from the
   agent/rule frontmatter checks.
 
-[Unreleased]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/EinsZweiDrei-ai/einszweidrei-claude-kit/compare/v0.4.0...v0.5.0

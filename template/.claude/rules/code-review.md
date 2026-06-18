@@ -9,8 +9,8 @@ Companion to [CLAUDE.md](../../CLAUDE.md). Reviewers and the `code-reviewer` /
 while any **Gate** item fails.
 
 > Universal gates are below. **Stack-specific gates** apply when editing that file type —
-> .NET DB/async in [dotnet.md](dotnet.md), frontend a11y/security in [frontend.md](frontend.md).
-> Project stack/helpers: [project/context.md](../project/context.md).
+> e.g. .NET DB/async or frontend a11y/security — see the matching stack rule in
+> `.claude/rules/` when one is installed. Project stack/helpers: [project/context.md](../project/context.md).
 
 ---
 

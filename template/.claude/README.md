@@ -14,18 +14,20 @@ CLAUDE.md                     # PORTABLE — stack-agnostic engineering standard
 ├── settings.local.json       # personal config (gitignored)
 ├── agents/                   # PORTABLE — subagents (backend / frontend / infra / quality)
 ├── rules/                    # PORTABLE — stack rules auto-apply by file type
-│   ├── code-review.md        #   always-on review checklist (stack-agnostic)
-│   ├── security.md           #   always-on web/app security
-│   ├── dotnet.md             #   paths: **/*.cs  — C# conventions, architecture, async
-│   ├── controllers.md        #   paths: **/Controllers/**
-│   ├── repositories.md       #   paths: **/*Repository.cs
-│   ├── services.md           #   paths: **/Services/**
-│   ├── frontend.md           #   paths: **/*.{ts,tsx,vue,...}  — TS/React/Vue
-│   └── testing.md            #   paths: test files
+│   ├── code-review.md        #   core, always-on review checklist (stack-agnostic)
+│   ├── commits.md            #   core, always-on commit conventions
+│   ├── security.md           #   core, always-on web/app security
+│   ├── dotnet.md             #   pack: dotnet — paths **/*.cs (C# conventions, async)
+│   ├── controllers.md        #   pack: dotnet — paths **/Controllers/**
+│   ├── repositories.md       #   pack: dotnet — paths **/*Repository.cs
+│   ├── services.md           #   pack: dotnet — paths **/Services/**
+│   ├── frontend.md           #   pack: frontend — paths **/*.{ts,tsx,vue,...}
+│   └── testing.md            #   pack: dotnet — paths test files
 ├── commands/                 # PORTABLE — slash commands (/claude-audit, /kit-init)
 ├── scripts/                  # PORTABLE — kit utilities (claude-audit.py)
 ├── hooks/                    # PORTABLE — hook scripts (pre-commit-audit.sh, session-start.sh)
 ├── .kit-version              # PORTABLE — installed kit version (stamped by install.py)
+├── .kit-packs                # PORTABLE — selected stack packs, or "all" (stamped by install.py)
 └── project/                  # PROJECT-SPECIFIC — do NOT copy to other repos
     ├── context.md            #   profile: stack, layout, conventions, key libraries
     └── …                     #   this repo's own docs (tech-debt register, refactor plans, ADRs)
@@ -40,10 +42,12 @@ CLAUDE.md                     # PORTABLE — stack-agnostic engineering standard
    framework, layout, key libraries, test setup), writes `.claude/project/context.md`,
    and wires the git pre-commit audit hook. No manual editing of the template needed — the
    portable files use generic globs and defer project specifics to `context.md`.
-3. **Keep the full agent roster.** This is a *curated* set (~21 agents across backend,
-   frontend, infra, quality) — not a generic dump. Agents are inert until invoked, so the
-   ones your stack doesn't use cost nothing, and leaving them in keeps every repo's kit
-   identical and upgradeable via `python install.py update`.
+3. **Pick your scope.** The kit ships every pack, so a full install (or a plain copy-paste of
+   this folder) works in any stack — agents are inert until invoked and rules self-scope by
+   file type. For a lean, stack-matched install, pass `python install.py --packs=…`, run
+   `install.py prune`, or let `/kit-init` trim to the detected stack. Stack-specific files
+   carry a `pack:` frontmatter tag (`dotnet`/`frontend`); untagged files are core and always
+   kept. `install.py update` honors whatever selection is recorded in `.kit-packs`.
 
 > The portable layer degrades gracefully: even before `context.md` exists, the generic
 > rules and standards apply. **Stack rules fire by file type** — `dotnet.md` only on `.cs`,
