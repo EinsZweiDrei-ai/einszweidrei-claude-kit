@@ -68,4 +68,5 @@ defaults in CLAUDE.md / .claude/rules.]
 ## Related project docs
 
 - Tracked technical debt: [tech-debt.md](tech-debt.md)
+- Decisions & learnings (project memory): [decisions.md](decisions.md)
 - [Add ADRs, refactor plans, or other repo-specific docs here as they appear.]

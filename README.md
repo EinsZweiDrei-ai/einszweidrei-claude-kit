@@ -27,7 +27,7 @@ You can use either or both.
 | Stack rules        | `template/.claude/rules/`                  | File-type rules that auto-apply by path. **Core:** always-on `code-review.md`, `commits.md`, `security.md`. **Pack-tagged:** `dotnet` (dotnet/controllers/repositories/services/testing) and `frontend`. |
 | Slash commands     | `template/.claude/commands/`              | `*.md` commands (`/claude-audit`, `/kit-init`); format guide in the README there. |
 | Audit tooling      | `template/.claude/scripts/` + `hooks/` + `.githooks/` | `claude-audit.py` consistency check, the `pre-commit-audit.sh` PreToolUse launcher, the `session-start.sh` bootstrap, and a `.githooks/pre-commit` for human commits. |
-| Project instance   | `template/.claude/project/`               | Per-repo `context.md` profile + `tech-debt.md` register (placeholders to fill). |
+| Project instance   | `template/.claude/project/`               | Per-repo `context.md` profile, `tech-debt.md` register, and `decisions.md` memory log — committed project state (placeholders to fill). |
 | Skills             | `template/.claude/skills/`                | `<name>/SKILL.md` skills (format guide in the README there; none shipped yet).  |
 
 Everything lives under `template/.claude/` as a **single source of truth** — the

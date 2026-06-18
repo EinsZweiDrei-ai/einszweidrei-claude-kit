@@ -14,6 +14,8 @@ Trivial edits (typos, comments, formatting, config tweaks) may skip steps 2 and 
 
 Commit messages follow [rules/commits.md](rules/commits.md) — Conventional Commits + imperative 50/72 style; `release-manager` turns the commit types into the changelog entry and version bump.
 
+Record durable **decisions & learnings** — a non-obvious choice, a gotcha, an adopted convention — in [project/decisions.md](project/decisions.md), the project's committed memory. Not routine changes (git/changelog) and not accepted violations (those go in [project/tech-debt.md](project/tech-debt.md)).
+
 ## Delegate vs. do inline
 - **Inline:** small, localized changes within the current context.
 - **Delegate to a subagent when:** the task is a self-contained chunk needing deep focus or a different specialty; it benefits from an isolated context; or you need an independent review (code/architecture). Give the agent the file paths and the goal; one responsibility per delegation.

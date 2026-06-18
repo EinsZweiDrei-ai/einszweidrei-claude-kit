@@ -52,8 +52,9 @@ Skip this (leave the full kit in place) if you can't confidently determine the s
   following its existing headings. **Remove the `PLACEHOLDER — REPLACE THIS FILE` banner
   comment** at the top. Fill every section with concrete, verified facts; if something
   genuinely doesn't apply, say so briefly rather than leaving a bracketed placeholder.
-- **Leave [`.claude/project/tech-debt.md`](../project/tech-debt.md) as-is** if it's still
-  the empty register; it ships ready to use. (Do not invent debt entries.)
+- **Leave [`.claude/project/tech-debt.md`](../project/tech-debt.md) and
+  [`decisions.md`](../project/decisions.md) as-is** if they're still the empty register/log;
+  they ship ready to use. (Do not invent debt or decision entries.)
 - Keep project-specific names OUT of the portable files — they belong only under
   `.claude/project/`. (The audit's leakage check enforces this.)
 

@@ -30,7 +30,9 @@ CLAUDE.md                     # PORTABLE — stack-agnostic engineering standard
 ├── .kit-packs                # PORTABLE — selected stack packs, or "all" (stamped by install.py)
 └── project/                  # PROJECT-SPECIFIC — do NOT copy to other repos
     ├── context.md            #   profile: stack, layout, conventions, key libraries
-    └── …                     #   this repo's own docs (tech-debt register, refactor plans, ADRs)
+    ├── tech-debt.md          #   accepted rule violations (register)
+    ├── decisions.md          #   decisions & learnings (the team's committed project memory)
+    └── …                     #   other repo-specific docs (refactor plans, ADRs)
 ```
 
 ## Reusing this in another project
