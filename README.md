@@ -28,7 +28,7 @@ You can use either or both.
 | Slash commands     | `template/.claude/commands/`              | `*.md` commands (`/claude-audit`, `/kit-init`); format guide in the README there. |
 | Audit tooling      | `template/.claude/scripts/` + `hooks/` + `.githooks/` | `claude-audit.py` consistency check, the `pre-commit-audit.sh` PreToolUse launcher, the `session-start.sh` bootstrap, and a `.githooks/pre-commit` for human commits. |
 | Project instance   | `template/.claude/project/`               | Per-repo `context.md` profile, `tech-debt.md` register, and `decisions.md` memory log — committed project state (placeholders to fill). |
-| Skills             | `template/.claude/skills/`                | `<name>/SKILL.md` skills (format guide in the README there; none shipped yet).  |
+| Skills             | `template/.claude/skills/`                | `<name>/SKILL.md` skills. Ships **`ponytail`** — "lazy senior dev" minimalism (YAGNI, stdlib-first, `lite/full/ultra` levels), vendored from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) (MIT). Format guide in the README there. |
 
 Everything lives under `template/.claude/` as a **single source of truth** — the
 plugin manifests point at it, and the installer copies from it.
@@ -158,6 +158,23 @@ einszweidrei-claude-kit/
 
 Improvements are welcome — that's the whole point. See [CONTRIBUTING.md](CONTRIBUTING.md)
 for where each component type lives, the frontmatter formats, and the PR workflow.
+
+## Credits
+
+The `ponytail` skill (`template/.claude/skills/ponytail/`) is vendored from
+[DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) by Dietrich Gebert,
+used under the MIT license — see the `NOTICE` beside it. Pinned at v4.8.4.
+
+Prefer the full upstream suite (the additional `ponytail-audit` / `-debt` / `-gain` /
+`-review` / `-help` skills, hooks, and always-on ruleset) or auto-updates? Install it as a
+companion plugin instead:
+
+```
+/plugin marketplace add DietrichGebert/ponytail
+/plugin install ponytail@ponytail
+```
+
+The plugin defines a skill of the same name as the vendored copy — use one or the other.
 
 ## License
 

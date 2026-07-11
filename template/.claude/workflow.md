@@ -45,5 +45,10 @@ Record durable **decisions & learnings** — a non-obvious choice, a gotcha, an 
 
 Pick the **most specific** match.
 
+For any coding task, the **`ponytail`** skill ([skills/ponytail/SKILL.md](skills/ponytail/SKILL.md))
+enforces a YAGNI / stdlib-first / shortest-working-diff discipline — invoke it
+(`/ponytail lite|full|ultra`) when minimizing scope or cutting over-engineering matters. It layers
+on top of [CLAUDE.md](../CLAUDE.md) and the [rules/](rules/), never over them.
+
 ## Keeping the kit healthy
 Run **`/claude-audit`** after changing agents/rules/`project/` docs (and a commit hook re-runs it before commits). See [README.md](README.md).

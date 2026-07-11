@@ -24,6 +24,7 @@ CLAUDE.md                     # PORTABLE — stack-agnostic engineering standard
 │   ├── frontend.md           #   pack: frontend — paths **/*.{ts,tsx,vue,...}
 │   └── testing.md            #   pack: dotnet — paths test files
 ├── commands/                 # PORTABLE — slash commands (/claude-audit, /kit-init)
+├── skills/                   # PORTABLE — <name>/SKILL.md skills (ships `ponytail`; format guide in its README)
 ├── scripts/                  # PORTABLE — kit utilities (claude-audit.py)
 ├── hooks/                    # PORTABLE — hook scripts (pre-commit-audit.sh, session-start.sh)
 ├── .kit-version              # PORTABLE — installed kit version (stamped by install.py)

@@ -1,0 +1,48 @@
+Third-party component vendored into the EinsZweiDrei Claude Kit
+==============================================================
+
+Component : ponytail (the "ponytail" skill — SKILL.md in this directory)
+Source    : https://github.com/DietrichGebert/ponytail
+Path       : skills/ponytail/SKILL.md
+Version   : 4.8.4
+Commit    : 14a0d79548d4de8fc2de95c1b94bb0de63a739d3
+Vendored  : 2026-07-11
+License   : MIT
+
+SKILL.md is a verbatim copy of the upstream file at the commit above. Only the
+core "ponytail" skill is vendored; the upstream project also ships additional
+skills (ponytail-audit, -debt, -gain, -review, -help), hooks, and an AGENTS.md
+ruleset that are NOT included here.
+
+Re-syncing to a newer upstream release
+--------------------------------------
+1. Re-fetch skills/ponytail/SKILL.md from the upstream repo at the desired tag.
+2. Overwrite SKILL.md in this directory (keep it byte-for-byte for a clean diff).
+3. Update the Version / Commit / Vendored fields above.
+4. Add a CHANGELOG.md entry under [Unreleased] noting the bump.
+
+
+Upstream license
+----------------
+
+MIT License
+
+Copyright (c) 2026 DietrichGebert
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

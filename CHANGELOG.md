@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`ponytail` skill (first shipped skill).** Vendored the "lazy senior dev" minimalism skill —
+  a YAGNI → stdlib → platform → existing-dep → one-line → minimal-code ladder with `lite/full/ultra`
+  intensity levels, and explicit "never lazy about" guardrails (input validation, error handling,
+  security, accessibility). Ships as **core** (always installed) via both the plugin and the
+  copy-in installer. From [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
+  (MIT), pinned at v4.8.4; attribution in `template/.claude/skills/ponytail/NOTICE`.
 - **`nodejs` stack pack.** New `nodejs-developer` agent (`pack: nodejs`) for server-side
   Node.js + TypeScript — APIs/services (Express/Fastify/NestJS/Hono), CLIs, and libraries:
   strict typing, async correctness, error handling, ESM/CJS packaging, and testing. `/kit-init`
