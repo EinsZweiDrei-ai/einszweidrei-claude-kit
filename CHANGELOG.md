@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`nodejs` stack pack.** New `nodejs-developer` agent (`pack: nodejs`) for server-side
+  Node.js + TypeScript — APIs/services (Express/Fastify/NestJS/Hono), CLIs, and libraries:
+  strict typing, async correctness, error handling, ESM/CJS packaging, and testing. `/kit-init`
+  now detects a server-side `package.json` and keeps the `nodejs` pack (a full-stack repo can
+  keep `frontend` + `nodejs`); `install.py --packs=nodejs` installs it on its own.
+
 ## [0.9.0] - 2026-06-18
 
 ### Added

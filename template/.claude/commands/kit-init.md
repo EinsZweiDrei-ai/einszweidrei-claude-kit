@@ -35,7 +35,12 @@ repo actually needs. Map the detected stack to packs:
 
 - `*.sln`/`*.csproj` (.NET) → keep **`dotnet`**
 - `package.json` with React/Vue, or `*.tsx`/`*.vue` files → keep **`frontend`**
-- neither → keep neither (core only)
+- `package.json` for a server-side Node app (Express/Fastify/NestJS/Hono, a CLI, or a
+  library) → keep **`nodejs`**
+- none → keep none (core only)
+
+A full-stack repo can match more than one — e.g. a Next.js app or a React client with a
+Node API keeps both **`frontend`** and **`nodejs`**.
 
 Pack-specific files carry a `pack:` line in their frontmatter. Find the pack-tagged files
 under `.claude/rules/` and `.claude/agents/` (e.g. `grep -rl "^pack:" .claude/rules .claude/agents`),
