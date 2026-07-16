@@ -37,6 +37,7 @@ repo actually needs. Map the detected stack to packs:
 - `package.json` with React/Vue, or `*.tsx`/`*.vue` files → keep **`frontend`**
 - `package.json` for a server-side Node app (Express/Fastify/NestJS/Hono, a CLI, or a
   library) → keep **`nodejs`**
+- `Cargo.toml` (Rust) → keep **`rust`**
 - none → keep none (core only)
 
 A full-stack repo can match more than one — e.g. a Next.js app or a React client with a

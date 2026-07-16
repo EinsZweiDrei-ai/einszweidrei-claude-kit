@@ -94,7 +94,7 @@ also works in any project (pack rules self-scope by file type, and agents are in
 invoked). To install only what a stack needs, pass `--packs`:
 
 ```sh
-python install.py /path/to/your/project --packs=dotnet     # packs: dotnet, frontend, nodejs (combine: dotnet,nodejs)
+python install.py /path/to/your/project --packs=dotnet     # packs: dotnet, frontend, nodejs, rust (combine: dotnet,nodejs)
 ```
 
 Core files are always included; pack-tagged files (those with a `pack:` frontmatter field) are

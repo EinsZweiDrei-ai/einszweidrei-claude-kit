@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`rust` stack pack.** New `rust-developer` agent (`pack: rust`) for Rust — services/APIs, CLIs,
+  systems code, and libraries: ownership/borrowing, `Result`-based error handling, async (tokio),
+  `unsafe` discipline, and `cargo`/`clippy`/`test`. Adds a `.rs`-scoped `rules/rust.md`; `/kit-init`
+  detects a `Cargo.toml` and keeps the `rust` pack; `install.py --packs=rust` installs it on its own.
 - **`ponytail` skill (first shipped skill).** Vendored the "lazy senior dev" minimalism skill —
   a YAGNI → stdlib → platform → existing-dep → one-line → minimal-code ladder with `lite/full/ultra`
   intensity levels, and explicit "never lazy about" guardrails (input validation, error handling,
