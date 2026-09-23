@@ -25,6 +25,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   now detects a server-side `package.json` and keeps the `nodejs` pack (a full-stack repo can
   keep `frontend` + `nodejs`); `install.py --packs=nodejs` installs it on its own.
 
+### Changed
+
+- **Reviewer and analyst agents now set `effort: high`.** `code-reviewer`, `architect-reviewer`,
+  `security-auditor`, `security-engineer`, `debugger`, and `performance-engineer` pin their
+  reasoning effort, because `opus` now resolves to Opus 5.5, which defaults to `medium` effort.
+  Other agents keep inheriting the session's effort. Model aliases are unchanged: `opus` (Opus 5.5)
+  and `sonnet` (Sonnet 5) already track the newest models.
+- The agent and command format guides now show `model: sonnet` instead of the outdated
+  `claude-sonnet-4-6`, document the `effort` field and every accepted `model` value, and explain
+  how to pin models on Bedrock, Google Cloud, and Microsoft Foundry, where aliases can map to older
+  models.
+
 ## [0.9.0] - 2026-06-18
 
 ### Added

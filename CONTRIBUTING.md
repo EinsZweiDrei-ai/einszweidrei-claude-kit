@@ -30,7 +30,8 @@ for how the whole `.claude/` layout fits together.
 description: required — shown in the command picker
 argument-hint: optional
 allowed-tools: optional
-model: optional
+model: optional — an alias (opus/sonnet/haiku/fable) or inherit
+effort: optional — low/medium/high/xhigh/max
 ---
 Body prompt. Use $ARGUMENTS / $1, !shell-cmd, and @file.
 ```
@@ -42,7 +43,8 @@ Body prompt. Use $ARGUMENTS / $1, !shell-cmd, and @file.
 name: required — unique across all agents
 description: required — when to use this agent
 tools: optional
-model: optional
+model: optional — an alias (opus/sonnet/haiku/fable) or inherit; see agents/README.md
+effort: optional — low/medium/high/xhigh/max
 pack: optional — stack tag (e.g. dotnet/frontend) so the file can be trimmed; omit for core
 ---
 > **Project precedence:** This project's CLAUDE.md is authoritative. If anything

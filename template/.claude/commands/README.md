@@ -15,7 +15,8 @@ This README is a format guide and keepfile — drop your own `*.md` commands bes
 description: Short summary shown in the command list.   # required
 argument-hint: <issue-number>                           # optional — shown after the command name
 allowed-tools: Bash(git status:*), Read, Edit           # optional — restrict tools for this command
-model: claude-sonnet-4-6                                # optional — override the model for this command
+model: sonnet                                           # optional — override the model for this command
+effort: high                                            # optional — override the reasoning effort
 ---
 ```
 
@@ -24,7 +25,8 @@ model: claude-sonnet-4-6                                # optional — override 
 | `description`   | yes      | One line shown in the `/` command picker.                      |
 | `argument-hint` | no       | Hint text for expected arguments.                              |
 | `allowed-tools` | no       | Whitelist of tools the command may use.                        |
-| `model`         | no       | Pin a specific model for this command.                         |
+| `model`         | no       | `opus`, `sonnet`, `haiku`, `fable`, a full model ID, or `inherit`. Prefer an alias — see [agents/README.md](../agents/README.md#choosing-a-model). |
+| `effort`        | no       | `low`, `medium`, `high`, `xhigh`, or `max`. Overrides the session's effort while the command runs. |
 
 ## Body
 
