@@ -9,7 +9,8 @@ Cross-platform (Windows + Linux + macOS). Standard library only — no dependenc
 On a commit, --pre-commit and --hook additionally run the REVIEW GATE: if source files
 changed since the last commit without a recorded code-review (.claude/.last-review), the
 commit is BLOCKED for Claude (--hook) and WARNED for humans (--pre-commit). Reviewer agents
-record the review with --record-review; [skip-review] in the commit message bypasses it.
+record the review with --record-review; [skip-review] in the commit command bypasses it.
+Paths listed in .claude/project/review-ignore (one glob per line) never trigger it.
 
 Usage:
     python claude-audit.py [ROOT] [--pre-commit | --hook | --record-review]
@@ -19,9 +20,9 @@ Usage:
     --pre-commit    Silent on PASS; on FAIL print guidance + report to stderr and
                     exit 2. Use from a git pre-commit hook (any non-zero blocks).
                     Also warns (does not block) on a pending review.
-    --hook          Claude Code PreToolUse(Bash) gate. Reads the hook payload on
-                    stdin, and runs the audit ONLY when the command is a `git commit`
-                    (allowing every other Bash call through with exit 0). Hook
+    --hook          Claude Code PreToolUse(Bash|PowerShell) gate. Reads the hook payload
+                    on stdin, and runs the audit ONLY when the command is a `git commit`
+                    (allowing every other shell call through with exit 0). Hook
                     matchers filter on tool NAME only, so this command-level gate has
                     to live here, in the script — not in settings.json. Blocks the
                     commit (exit 2) on a structural FAIL or a pending review.
@@ -30,6 +31,7 @@ Usage:
 """
 
 import argparse
+import fnmatch
 import json
 import os
 import re
@@ -201,13 +203,16 @@ def find_csproj(root, filename, maxdepth=3):
 # the reviewer agents stamp the reviewed commit into .claude/.last-review (via
 # --record-review), and a commit that changes source files without a matching record is
 # BLOCKED for Claude (--hook) and WARNED for humans (--pre-commit). [skip-review] in the
-# commit message bypasses it (trivial edits); docs/config-only commits never trigger it.
+# commit command bypasses it (trivial edits); docs/config/asset-only commits never trigger
+# it, and neither do paths listed in .claude/project/review-ignore.
 
 REVIEW_MARKER = ".claude/.last-review"
+REVIEW_IGNORE = ".claude/project/review-ignore"
 
 _NON_SOURCE_EXT = (
-    ".md", ".json", ".yml", ".yaml", ".toml", ".ini", ".cfg", ".lock", ".txt",
-    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico",
+    ".md", ".json", ".yml", ".yaml", ".toml", ".ini", ".cfg", ".lock", ".txt", ".csv",
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp", ".avif", ".bmp", ".tif", ".tiff",
+    ".pdf", ".woff", ".woff2", ".ttf", ".otf", ".eot", ".mp4", ".webm", ".mp3", ".wav",
 )
 _NON_SOURCE_BASENAMES = {
     "license", "license.txt", "license.md", ".gitignore", ".gitattributes",
@@ -243,14 +248,45 @@ def is_source_path(path):
     return True
 
 
+def read_review_ignore(root):
+    """Globs from .claude/project/review-ignore (blank lines and # comments skipped)."""
+    path = os.path.join(root, *REVIEW_IGNORE.split("/"))
+    try:
+        if not os.path.isfile(path):
+            return []
+        lines = read(path).splitlines()
+    except OSError:
+        return []
+    return [ln.strip() for ln in lines if ln.strip() and not ln.strip().startswith("#")]
+
+
+def is_review_ignored(path, patterns):
+    """True if `path` matches a review-ignore glob; a trailing `/` means a directory."""
+    p = path.replace("\\", "/")
+    for pat in patterns:
+        if pat.endswith("/"):
+            if p.startswith(pat):
+                return True
+        elif fnmatch.fnmatch(p, pat):
+            return True
+    return False
+
+
 def changed_source_files(root):
-    """Source files changed since HEAD (staged + unstaged). None if undeterminable."""
+    """Source files changed since HEAD (staged, unstaged, and untracked). None if unknown.
+
+    Untracked files count because the PreToolUse gate runs BEFORE the command, so in
+    `git add -A && git commit` a brand-new file is still untracked when it is checked.
+    """
     rc, out = _git(root, ["diff", "HEAD", "--name-only"])
     if rc != 0:  # e.g. no commits yet — fall back to the staged set
         rc, out = _git(root, ["diff", "--cached", "--name-only"])
         if rc != 0:
             return None
-    return [f.strip() for f in out.splitlines() if f.strip() and is_source_path(f.strip())]
+    _rc, untracked = _git(root, ["ls-files", "--others", "--exclude-standard"])
+    ignore = read_review_ignore(root)
+    files = (f.strip() for f in (out + "\n" + untracked).splitlines())
+    return [f for f in files if f and is_source_path(f) and not is_review_ignored(f, ignore)]
 
 
 def read_review_marker(root):
@@ -265,17 +301,15 @@ def read_review_marker(root):
     return content.splitlines()[0].strip() if content else None
 
 
-def commit_message_has_skip(root, command):
-    """True if a [skip-review] escape is present (commit command or COMMIT_EDITMSG)."""
-    if command and "[skip-review]" in command:
-        return True
-    path = os.path.join(root, ".git", "COMMIT_EDITMSG")
-    try:
-        if os.path.isfile(path) and "[skip-review]" in read(path):
-            return True
-    except OSError:
-        pass
-    return False
+def commit_message_has_skip(command):
+    """True if the commit command carries the [skip-review] escape.
+
+    Only the command is checked. .git/COMMIT_EDITMSG still holds the PREVIOUS commit's
+    message when the gate runs, so reading it would let one [skip-review] commit skip the
+    next one too. A git pre-commit hook has no command, so human commits always get the
+    (non-blocking) warning.
+    """
+    return bool(command) and "[skip-review]" in command
 
 
 def review_pending(root, command):
@@ -283,7 +317,7 @@ def review_pending(root, command):
     changed = changed_source_files(root)
     if not changed:  # None (unknown) or [] (no source) — nothing to enforce
         return None
-    if commit_message_has_skip(root, command):
+    if commit_message_has_skip(command):
         return None
     if read_review_marker(root) == current_head(root):
         return None  # a review was recorded against the current state
@@ -293,7 +327,8 @@ def review_pending(root, command):
         f"No code-review recorded for {n} changed source file(s) since the last commit "
         f"({preview}). Run the code-reviewer agent (workflow step 5), apply its findings, "
         "then commit - it records the review automatically. For a trivial edit, add "
-        "[skip-review] to the commit message."
+        "[skip-review] to the commit message. To exclude non-code paths (mockups, assets), "
+        f"list globs in {REVIEW_IGNORE}."
     )
 
 
@@ -500,8 +535,8 @@ def main(argv=None):
     gate.add_argument(
         "--hook",
         action="store_true",
-        help="PreToolUse(Bash) gate: read the hook payload on stdin and audit only "
-        "git-commit commands. Allows every other Bash call through (exit 0).",
+        help="PreToolUse(Bash|PowerShell) gate: read the hook payload on stdin and audit "
+        "only git-commit commands. Allows every other shell call through (exit 0).",
     )
     gate.add_argument(
         "--record-review",
@@ -516,7 +551,7 @@ def main(argv=None):
         record_review(os.path.abspath(args.root) if args.root else repo_root())
         return 0
 
-    # --hook self-gates to git commits: the matcher fires this on EVERY Bash call, so
+    # --hook self-gates to git commits: the matcher fires this on EVERY shell call, so
     # we inspect the command and bail out (allow) unless it's an actual `git commit`.
     cmd = None
     if args.hook:

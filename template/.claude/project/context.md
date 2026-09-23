@@ -65,6 +65,18 @@ defaults in CLAUDE.md / .claude/rules.]
 - **Format / lint:** `[dotnet format]`
 - **Run:** `[dotnet run --project Acme.Api]`
 
+## Deliberate deviations from the kit
+
+Permanent, intentional choices that differ from a portable rule (CLAUDE.md or
+`.claude/rules/`). They override that rule in this repo, and reviewers don't report them.
+Put the reasoning in [decisions.md](decisions.md). A violation you mean to fix later
+belongs in [tech-debt.md](tech-debt.md) instead. Project-specific agent routing goes here
+too, since `workflow.md` is refreshed on `install.py update`.
+
+| Kit rule (file) | What this project does instead | Why |
+| --------------- | ------------------------------ | --- |
+| _(none yet)_ | | |
+
 ## Related project docs
 
 - Tracked technical debt: [tech-debt.md](tech-debt.md)

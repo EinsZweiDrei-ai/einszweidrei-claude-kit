@@ -23,9 +23,10 @@ Usage:
                   touching project state — .claude/project/** (context.md, tech-debt.md)
                   and .claude/settings.local.json are preserved. The existing
                   .claude/settings.json is backed up to settings.json.bak before it is
-                  refreshed, so any custom permissions can be re-merged.
+                  refreshed, so any custom permissions can be re-merged. Files an
+                  earlier kit version shipped but this one dropped are removed.
 
-    prune         Remove pack-tagged files NOT in --packs from an already-installed repo,
+    prune        Remove pack-tagged files NOT in --packs from an already-installed repo,
                   and record the selection so `update` keeps them out. /kit-init runs this
                   after detecting the stack.
 
@@ -34,9 +35,14 @@ own audit against the result, failing loudly (non-zero exit) if it does not PASS
 it is impossible to leave behind an artifact that fails the kit's own audit.
 
 Non-destructive by default: an install skips existing files unless --force/FORCE=1.
+
+Opting out of individual kit files: list repo-relative paths or globs (one per line, #
+comments) in .claude/.kit-exclude. Install and update skip them, so a core agent the
+project deleted stays deleted.
 """
 
 import argparse
+import fnmatch
 import json
 import os
 import re
@@ -50,6 +56,14 @@ SKIP_SUFFIXES = ("settings.local.json",)
 
 # On `update`, these are the per-repo project state — never overwrite them.
 PRESERVE_ON_UPDATE_PREFIXES = (".claude/project/",)
+
+# Files earlier kit versions shipped that this one dropped; `update` deletes them.
+# commands/README.md registered as a /README slash command (its guide moved into
+# .claude/README.md).
+OBSOLETE_ON_UPDATE = (".claude/commands/README.md",)
+
+# Per-repo opt-out list: repo-relative paths/globs that install and update skip.
+KIT_EXCLUDE_REL = os.path.join(".claude", ".kit-exclude")
 
 # settings.json is portable but commonly carries team permission edits, so `update`
 # backs it up before refreshing it.
@@ -173,6 +187,20 @@ def write_installed_packs(target_dir, packs):
     print(f"  stamped .claude/.kit-packs = {value}")
 
 
+def read_excludes(target_dir):
+    """Globs from .claude/.kit-exclude (blank lines and # comments skipped)."""
+    try:
+        with open(os.path.join(target_dir, KIT_EXCLUDE_REL), "r", encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
+    except OSError:
+        return []
+    return [ln.strip() for ln in lines if ln.strip() and not ln.strip().startswith("#")]
+
+
+def is_excluded(rel_display, excludes):
+    return any(fnmatch.fnmatch(rel_display, pat) for pat in excludes)
+
+
 def iter_template(src_dir):
     """Yield (src, rel, rel_display) for every template file, deterministically.
 
@@ -240,6 +268,7 @@ def do_install(args, src_dir, version):
     os.makedirs(args.target_dir, exist_ok=True)
     target_dir = os.path.abspath(args.target_dir)
     selected = parse_packs(args.packs)
+    excludes = read_excludes(target_dir)
 
     print("Installing EinsZweiDrei Claude Kit")
     print(f"  from: {src_dir}")
@@ -264,6 +293,9 @@ def do_install(args, src_dir, version):
         pack = file_pack(src)
         if selected is not None and pack is not None and pack not in selected:
             print(f"  skip   {rel_display} (pack '{pack}' not selected)")
+            continue
+        if is_excluded(rel_display, excludes):
+            print(f"  skip   {rel_display} (excluded by .kit-exclude)")
             continue
         if os.path.exists(dest) and not args.force:
             print(f"  skip   {rel_display} (exists)")
@@ -295,6 +327,7 @@ def do_update(args, src_dir, version):
 
     previous = read_installed_version(target_dir)
     selected = read_installed_packs(target_dir)
+    excludes = read_excludes(target_dir)
     print("Updating EinsZweiDrei Claude Kit")
     print(f"  from: {src_dir}")
     print(f"  into: {target_dir}")
@@ -316,6 +349,9 @@ def do_update(args, src_dir, version):
         pack = file_pack(src)
         if selected is not None and pack is not None and pack not in selected:
             continue  # pruned pack — don't re-add it
+        if is_excluded(rel_display, excludes):
+            print(f"  skip   {rel_display} (excluded by .kit-exclude)")
+            continue
 
         dest = os.path.join(target_dir, rel)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -326,6 +362,12 @@ def do_update(args, src_dir, version):
         shutil.copy2(src, dest)
         print(f"  write  {rel_display}")
         refreshed += 1
+
+    for rel_display in OBSOLETE_ON_UPDATE:
+        path = os.path.join(target_dir, *rel_display.split("/"))
+        if os.path.isfile(path):
+            os.remove(path)
+            print(f"  remove {rel_display} (no longer part of the kit)")
 
     print()
     print(f"Done. {refreshed} refreshed, {preserved} preserved.")

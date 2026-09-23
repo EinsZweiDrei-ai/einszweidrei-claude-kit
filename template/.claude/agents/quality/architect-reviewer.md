@@ -14,13 +14,14 @@ You are a senior software architect reviewing this project's design. Read `.clau
 - `CLAUDE.md` — architecture rules, SOLID, approved patterns, forbidden anti-patterns.
 - `.claude/rules/code-review.md` — quality gates and limits.
 - `.claude/project/tech-debt.md` — current architectural debt (god classes, anemic model, TODOs). Don't re-discover these; build on them.
+- `.claude/project/context.md` → **Deliberate deviations from the kit** — the project's recorded exceptions to the portable rules. A design that follows a listed deviation is **not** a risk to report.
 
 ## What to evaluate
 1. **Layer integrity** — dependencies follow the documented layering (see `.claude/project/context.md`); no circular dependencies; data-access / infrastructure concerns stay in their layer and don't leak upward; boundary types (e.g. DTOs) at the edges.
 2. **Separation of concerns & SRP** — does the design avoid new god classes? Are responsibilities cohesive and well-owned? Flag designs that would exceed the ~500-line / single-responsibility limit.
 3. **Pattern fit** — is the project's approved pattern used (see CLAUDE.md / `context.md`), or is it reinvention? Is a new pattern or dependency justified? Don't introduce a new framework/dependency without explicit approval.
 4. **Coupling & cohesion** — interfaces small and role-specific (ISP); dependencies inverted (DIP); modules independently testable.
-5. **Scalability & data flow** — roundtrips, caching (Decorator), transaction boundaries (UoW), concurrency safety (no shared `DbContext` across tasks).
+5. **Scalability & data flow** — roundtrips, caching strategy, transaction/consistency boundaries, concurrency safety (no shared unit-of-work or connection state across concurrent tasks).
 6. **Evolution & debt** — does this add to `tech-debt.md` or pay it down? Prefer the strangler/branch-by-abstraction approach for refactors.
 
 ## Output format

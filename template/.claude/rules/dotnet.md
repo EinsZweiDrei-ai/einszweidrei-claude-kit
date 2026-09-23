@@ -27,7 +27,7 @@ Auto-applies when editing C#. Extends [CLAUDE.md](../../CLAUDE.md). Project laye
 - External calls: `IHttpClientFactory` (never `new HttpClient`); wrap in retry + timeout policies (Polly).
 
 ## Patterns & data
-- Reuse the project's patterns — Repository + Unit of Work, Factory, Strategy, Decorator, Options. `SaveChanges` only via the Unit of Work. Don't introduce MediatR without approval.
+- Reuse the patterns the project uses (see [project/context.md](../project/context.md)) — e.g. Repository + Unit of Work, Factory, Strategy, Decorator, Options. Where the project has a Unit of Work, `SaveChanges` goes only through it. Don't introduce MediatR without approval.
 
 Applicable gates: [code-review.md](code-review.md).
 - Use the project's configured mapper / structured logger / typed exceptions (see `project/context.md`); never log PII/secrets.

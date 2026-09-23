@@ -1,7 +1,7 @@
 ---
 name: csharp-developer
 pack: dotnet
-description: "Use this agent when building ASP.NET Core web APIs, cloud-native .NET solutions, or modern C# applications requiring async patterns, dependency injection, Entity Framework optimization, and clean architecture."
+description: "Use this agent when writing or changing C#/.NET application code — ASP.NET Core APIs (controllers or Minimal APIs), services, background workers, libraries, and console apps — with correct async, dependency injection, and error handling, following the project's data-access and architecture choices in context.md."
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus
 ---

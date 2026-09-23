@@ -58,6 +58,10 @@ Skip this (leave the full kit in place) if you can't confidently determine the s
   following its existing headings. **Remove the `PLACEHOLDER — REPLACE THIS FILE` banner
   comment** at the top. Fill every section with concrete, verified facts; if something
   genuinely doesn't apply, say so briefly rather than leaving a bracketed placeholder.
+  Keep the **Deliberate deviations from the kit** section and its empty table. Add a row only
+  when the codebase clearly and consistently departs from a kit rule (e.g. it standardizes on
+  a different data-fetching approach than `rules/frontend.md` suggests), and tell the user
+  which rows you added so they can confirm them.
 - **Leave [`.claude/project/tech-debt.md`](../project/tech-debt.md) and
   [`decisions.md`](../project/decisions.md) as-is** if they're still the empty register/log;
   they ship ready to use. (Do not invent debt or decision entries.)

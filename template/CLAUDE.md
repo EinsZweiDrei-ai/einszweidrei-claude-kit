@@ -21,6 +21,12 @@ repo), create `context.md` by inspecting the project — language, framework, fo
 key libraries, test setup — then proceed. This file (CLAUDE.md) is stack-agnostic and
 applies to any repo as-is.
 
+Choices listed under **Deliberate deviations from the kit** in `context.md` override the
+portable rules in `.claude/rules/` for this repo. Follow them, and don't report them as
+violations.
+
+@.claude/project/context.md
+
 See [.claude/workflow.md](.claude/workflow.md) for the working loop (plan → implement → review → done) and agent-routing guide.
 
 ---

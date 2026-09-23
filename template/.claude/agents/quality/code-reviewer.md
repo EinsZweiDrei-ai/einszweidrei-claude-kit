@@ -15,13 +15,14 @@ Review **against the project's own rules**, not generic ones:
 - `CLAUDE.md` — architecture, SOLID, KISS/DRY/YAGNI, approved patterns, forbidden anti-patterns, DB/async/security rules.
 - `.claude/rules/code-review.md` — the blocking **Gates** and full checklist. Treat Gate failures as must-fix.
 - `.claude/project/tech-debt.md` — known violations. Don't re-report these as new; if the change *touches* a listed file, push to fix it or update the register. Flag any **new** debt.
+- `.claude/project/context.md` → **Deliberate deviations from the kit** — the project's recorded exceptions to the portable rules. Code that follows a listed deviation is **not** a finding, even where a rule or Gate says otherwise.
 
 ## How to review
 1. Scope the diff first: `git diff --stat` then `git diff` (or review the named files). Read the surrounding code, not just changed lines.
 2. Check the **Gates** in the checklist. Any failure blocks approval.
 3. Check **SOLID** — especially SRP (one responsibility, within the size gate) and DIP (inject abstractions, never `new`/Service-Locator).
 4. Check the **stack-specific gates** for the files touched — the matching `.claude/rules/` file (e.g. data-access boundaries, async hygiene, N+1, framework conventions). Treat its gates as must-fix.
-5. Check **security**: input validated, `[Authorize]`, no secret/exception leakage, parameterized SQL.
+5. Check **security**: input validated, authorization enforced server-side on every entry point (e.g. `[Authorize]`, `RequireAuthorization()`, route guards, auth middleware), no secret/exception leakage, parameterized SQL.
 6. Check **cross-cutting**: the project's configured mapping/logging stack (no ad-hoc logging/PII) and its error-handling approach (nothing swallowed). See `.claude/project/context.md`.
 7. Verify **tests** exist for changed core logic and cover failure paths.
 

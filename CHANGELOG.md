@@ -24,8 +24,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   strict typing, async correctness, error handling, ESM/CJS packaging, and testing. `/kit-init`
   now detects a server-side `package.json` and keeps the `nodejs` pack (a full-stack repo can
   keep `frontend` + `nodejs`); `install.py --packs=nodejs` installs it on its own.
+- **`.claude/.kit-exclude` opt-out list.** Repo-relative paths or globs listed there are skipped
+  by `install.py` and `install.py update`, so a core file a project deleted (e.g. an unused agent)
+  no longer comes back on every update.
+- **`.claude/project/review-ignore`.** Globs listed there (e.g. `mockups/`) never trigger the
+  commit review gate. It lives under `project/`, so `update` preserves it.
+- **More pre-approved commands.** `settings.json` now allows `npm test`, `npm run test/build/lint`,
+  `npx vitest`, and `cargo build/test/check/clippy/fmt`.
+- **Regression tests.** `scripts/test_kit.py` (standard library only) covers the review gate, the
+  installer's update/exclude behavior, and the validator. CI runs it on Linux and Windows.
+
+### Fixed
+
+- **The commit review gate now covers the PowerShell tool.** The PreToolUse matcher was `Bash`
+  only, so commits Claude made through PowerShell skipped the gate. It is now `Bash|PowerShell`.
+- **The gate no longer blocks every shell call in a repo without the kit.** The launcher looks up
+  the audit script in the current directory's git root. In another checkout the script was
+  missing, Python exited 2, and Claude Code treated that as "block". It now allows the call when
+  the script isn't there.
+- **`[skip-review]` no longer carries over to the next commit.** The gate also read
+  `.git/COMMIT_EDITMSG`, which still holds the *previous* commit's message when the gate runs. It
+  now checks only the commit command. Human commits always get the (non-blocking) warning,
+  because git's pre-commit hook can't see the new message.
+- **New, untracked source files now count as unreviewed changes.** The gate runs before
+  `git add -A && git commit`, so a brand-new file was still untracked and was never counted.
+- **`/README` is no longer a slash command.** `commands/README.md` registered as `/README`
+  (`/ezd-claude-kit:README` for plugin users). Its guide moved to a "Writing slash commands"
+  section in `.claude/README.md`, `install.py update` deletes the old file, and
+  `scripts/validate.py` now rejects a README inside `commands/`.
+- **Force-push is denied through PowerShell too.** `Bash(...)` permission rules don't apply to
+  the PowerShell tool, so `settings.json` now also denies `PowerShell(git push --force *)` and
+  `PowerShell(git push -f *)`.
+- **Stack-neutral reviewers.** `code-reviewer` no longer names the MVC-only `[Authorize]`, and
+  `architect-reviewer` no longer assumes EF Core (`DbContext`, Unit of Work). The
+  `csharp-developer` description no longer steers routing toward EF, Clean Architecture, and
+  Blazor, and `rules/dotnet.md` applies Repository + Unit of Work only where the project uses them.
+- **`validate.py` accepts the current hook schema.** It rejected valid hook fields (`if`,
+  `statusMessage`, `async`, …) and newer events (e.g. `PostToolUseFailure`, `SubagentStart`).
 
 ### Changed
+
+- **`context.md` loads every session.** `CLAUDE.md` now imports it with
+  `@.claude/project/context.md` instead of only linking to it.
+- **Supported way to record deliberate deviations.** `context.md` has a new "Deliberate
+  deviations from the kit" section. Entries there override the portable rules, and
+  `code-reviewer` / `architect-reviewer` don't report them. It's also where project-specific
+  agent routing goes, because `workflow.md` is refreshed on update and no longer asks to be edited.
+- **The review gate ignores more non-code files:** `.webp`, `.avif`, `.bmp`, `.tif(f)`, `.pdf`,
+  fonts, audio/video, and `.csv`.
+- **`settings.local.json` is ignored by the template's `.claude/.gitignore`**, so it no longer
+  depends on Claude Code's global git exclude.
+- Considered and declined: hashing the diff into the review marker. Every applied review
+  finding would invalidate the marker and force another review. The gate is a nudge, not a
+  security boundary.
 
 - **Reviewer and analyst agents now set `effort: high`.** `code-reviewer`, `architect-reviewer`,
   `security-auditor`, `security-engineer`, `debugger`, and `performance-engineer` pin their

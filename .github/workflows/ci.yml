@@ -18,6 +18,8 @@ jobs:
           python-version: "3.x"
       # Validator and installer are pure-Python — run them on every OS.
       - run: python scripts/validate.py
+      # Review-gate, installer, and validator regression tests (throwaway repos in temp).
+      - run: python scripts/test_kit.py
       # install.py self-validates (runs the kit's own audit and exits non-zero on FAIL),
       # so a packaged artifact that fails the audit fails the build here.
       - run: python install.py ci-install-test

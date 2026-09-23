@@ -22,7 +22,7 @@ Record durable **decisions & learnings** — a non-obvious choice, a gotcha, an 
 - When unsure, the main session handles it.
 
 ## Agent routing (task → agent)
-*Adjust to this repo's agent roster — pack-specific agents (e.g. `csharp-developer`, `react-developer`) are present only when their pack is installed.*
+*Skip agents that aren't installed here — pack-specific agents (e.g. `csharp-developer`, `react-developer`) are present only when their pack is installed, and a repo can opt out of others via `.kit-exclude`. Don't edit this table: `install.py update` refreshes this file. Record project-specific routing under "Deliberate deviations" in [project/context.md](project/context.md).*
 
 | Task | Agent |
 |---|---|

@@ -7,9 +7,10 @@ Checks:
   * .claude-plugin/marketplace.json has "name", "owner", "plugins".     (error)
   * settings.json hooks block conforms to the Claude Code hook schema.  (error)
   * Every SKILL.md has a "description" in its YAML frontmatter.          (error)
+  * No README.md inside a commands/ directory (it would become /README). (error)
   * Command/agent *.md files missing frontmatter.                       (warning)
 
-README.md files are ignored. Warnings do not fail the build; errors exit non-zero.
+Other README.md files are ignored. Warnings do not fail the build; errors exit non-zero.
 
 Usage:
     python3 scripts/validate.py [REPO_ROOT]
@@ -22,15 +23,24 @@ import sys
 errors = []
 warnings = []
 
-# Claude Code hook schema (the bits we ship): hooks is an object keyed by event name;
-# each event is a list of matcher-groups; each group has an optional string `matcher`
-# (matched against the tool NAME only) and a `hooks` list of command entries.
+# Claude Code hook schema (https://code.claude.com/docs/en/hooks): hooks is an object keyed
+# by event name; each event is a list of matcher-groups; each group has an optional string
+# `matcher` (matched against the tool NAME only) and a `hooks` list of command entries.
 KNOWN_HOOK_EVENTS = {
-    "PreToolUse", "PostToolUse", "UserPromptSubmit", "Notification",
-    "Stop", "SubagentStop", "PreCompact", "SessionStart", "SessionEnd",
+    "SessionStart", "Setup", "UserPromptSubmit", "UserPromptExpansion", "PreToolUse",
+    "PermissionRequest", "PermissionDenied", "PostToolUse", "PostToolUseFailure",
+    "PostToolBatch", "Notification", "MessageDisplay", "SubagentStart", "SubagentStop",
+    "TaskCreated", "TaskCompleted", "Stop", "StopFailure", "TeammateIdle",
+    "InstructionsLoaded", "ConfigChange", "CwdChanged", "DirectoryAdded", "FileChanged",
+    "WorktreeCreate", "WorktreeRemove", "PreCompact", "PostCompact", "PreModelSwitch",
+    "PostModelSwitch", "Elicitation", "ElicitationResult", "SessionEnd",
 }
 MATCHER_GROUP_KEYS = {"matcher", "hooks"}
-HOOK_ENTRY_KEYS = {"type", "command", "timeout"}
+# Common handler fields plus the command-hook fields (the kit ships command hooks only).
+HOOK_ENTRY_KEYS = {
+    "type", "if", "timeout", "statusMessage", "once",
+    "command", "args", "async", "asyncRewake", "shell",
+}
 
 
 def repo_root():
@@ -75,9 +85,8 @@ def parse_frontmatter(text):
 def check_hooks(root, path, data):
     """Validate a settings file's hooks block against the Claude Code hook schema.
 
-    Catches the classic mistake of gating a hook with an unsupported per-hook field
-    (e.g. `if`): matchers filter on the tool NAME only, so command-level conditions
-    must live in the hook script, not the JSON.
+    Catches misspelled events and unsupported fields, which Claude Code would otherwise
+    ignore without telling anyone.
     """
     hooks = data.get("hooks")
     if hooks is None:
@@ -116,8 +125,7 @@ def check_hooks(root, path, data):
                     if key not in HOOK_ENTRY_KEYS:
                         errors.append(
                             f"{rp}: hook command has unsupported field '{key}' "
-                            f"(allowed: {', '.join(sorted(HOOK_ENTRY_KEYS))}) - "
-                            "e.g. 'if' is NOT a valid hook field; gate in the script instead"
+                            f"(allowed: {', '.join(sorted(HOOK_ENTRY_KEYS))})"
                         )
                 if entry.get("type") != "command":
                     errors.append(f"{rp}: hooks.{event}[].hooks[].type must be 'command'")
@@ -146,6 +154,11 @@ def main():
         base = os.path.basename(path)
 
         if base.lower() == "readme.md":
+            if f"{os.sep}commands{os.sep}" in path:
+                errors.append(
+                    f"{rel(root, path)}: every *.md in commands/ becomes a slash command, "
+                    "so this README would register as /README - move the guide elsewhere"
+                )
             continue
 
         if path.endswith(".json"):

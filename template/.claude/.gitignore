@@ -1,3 +1,6 @@
 # Runtime review-gate marker — recorded by the reviewer agents, checked by the
 # commit-time review gate (scripts/claude-audit.py). Never committed or distributed.
 .last-review
+
+# Personal, per-developer Claude Code settings — never committed.
+settings.local.json

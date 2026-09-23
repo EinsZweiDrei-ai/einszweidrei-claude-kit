@@ -25,7 +25,7 @@ You can use either or both.
 | Workflow           | `template/.claude/workflow.md`            | The working loop (plan → implement → review → done) and task→agent routing.     |
 | Subagents          | `template/.claude/agents/`                | A **curated** ~21 specialist agents in `backend/`, `frontend/`, `infra/`, `quality/`. Stack-specific ones carry a `pack:` tag (`dotnet`/`frontend`) so an install can be trimmed; the rest are core. |
 | Stack rules        | `template/.claude/rules/`                  | File-type rules that auto-apply by path. **Core:** always-on `code-review.md`, `commits.md`, `security.md`. **Pack-tagged:** `dotnet` (dotnet/controllers/repositories/services/testing) and `frontend`. |
-| Slash commands     | `template/.claude/commands/`              | `*.md` commands (`/claude-audit`, `/kit-init`); format guide in the README there. |
+| Slash commands     | `template/.claude/commands/`              | `*.md` commands (`/claude-audit`, `/kit-init`). The format guide is in `template/.claude/README.md`, since every `*.md` in `commands/` becomes a command. |
 | Audit tooling      | `template/.claude/scripts/` + `hooks/` + `.githooks/` | `claude-audit.py` consistency check, the `pre-commit-audit.sh` PreToolUse launcher, the `session-start.sh` bootstrap, and a `.githooks/pre-commit` for human commits. |
 | Project instance   | `template/.claude/project/`               | Per-repo `context.md` profile, `tech-debt.md` register, and `decisions.md` memory log — committed project state (placeholders to fill). |
 | Skills             | `template/.claude/skills/`                | `<name>/SKILL.md` skills. Ships **`ponytail`** — "lazy senior dev" minimalism (YAGNI, stdlib-first, `lite/full/ultra` levels), vendored from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) (MIT). Format guide in the README there. |
@@ -115,7 +115,10 @@ python install.py update /path/to/your/project
 settings) and **preserves** `.claude/project/**` (your `context.md` + `tech-debt.md`) and
 `.claude/settings.local.json`. It backs up `.claude/settings.json` to `settings.json.bak`
 before refreshing it, so you can re-merge any custom permissions. Like install, it
-self-validates and re-stamps `.claude/.kit-version`.
+self-validates and re-stamps `.claude/.kit-version`. Files a newer kit dropped are removed.
+
+To keep a core file out for good (e.g. an agent you deleted), list its repo-relative path or
+glob in `.claude/.kit-exclude`, one per line. `install.py` and `update` skip listed paths.
 
 With no argument either command operates on the current directory. Copy-in commands are
 invoked as `/<name>` (no namespace).
@@ -131,15 +134,15 @@ einszweidrei-claude-kit/
 │   ├── CLAUDE.md            # engineering standards (stays at repo root when copied)
 │   ├── .githooks/           # git pre-commit audit hook (for human commits)
 │   └── .claude/
-│       ├── README.md        # explains the .claude/ layout
+│       ├── README.md        # explains the .claude/ layout (+ slash-command guide)
 │       ├── workflow.md      # working loop + agent routing
 │       ├── settings.json    # permissions + pre-commit & session-start hooks
-│       ├── commands/        # *.md slash commands (/claude-audit, /kit-init) (+ format guide)
+│       ├── commands/        # *.md slash commands (/claude-audit, /kit-init)
 │       ├── agents/          # subagents in backend/ frontend/ infra/ quality/ (+ format guide)
 │       ├── rules/           # stack rules that auto-apply by file type
 │       ├── scripts/         # claude-audit.py consistency check
 │       ├── hooks/           # pre-commit-audit.sh + session-start.sh launchers
-│       ├── project/         # per-repo context.md + tech-debt.md (placeholders)
+│       ├── project/         # per-repo context.md, tech-debt.md, decisions.md (placeholders)
 │       └── skills/          # <name>/SKILL.md (+ format guide)
 ├── install.py               # cross-platform installer + `update` (self-validating)
 ├── install.sh               # POSIX shim that forwards to install.py

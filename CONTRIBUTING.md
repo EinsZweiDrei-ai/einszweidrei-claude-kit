@@ -17,8 +17,10 @@ contribution in the matching directory:
 | A stack rule     | `template/.claude/rules/<name>.md`                     | One `*.md` file with `description` (and optional `paths:` to scope by file type, plus an optional `pack:` tag like `dotnet`/`frontend` so it can be trimmed — omit `pack:` for core rules). |
 | A skill          | `template/.claude/skills/<name>/SKILL.md`              | A directory containing `SKILL.md`.             |
 
-Each component directory has a `README.md` with the full format guide and an example —
-read it before adding files. See [`template/.claude/README.md`](template/.claude/README.md)
+The `agents/` and `skills/` directories each have a `README.md` with the full format guide and
+an example; the slash-command guide is in `template/.claude/README.md` (a README inside
+`commands/` would itself become a `/README` command, and `validate.py` rejects one). Read the
+guide before adding files. See [`template/.claude/README.md`](template/.claude/README.md)
 for how the whole `.claude/` layout fits together.
 
 ## Frontmatter formats (quick reference)
